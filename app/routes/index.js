@@ -16,21 +16,24 @@ module.exports = function (app, passport) {
     }
     
     var clickHandler = new ClickHandler();
-
+    
+    //no auth
     app.route('/')
-        .get(isLoggedIn, function (req, res) {
+        .get( function (req, res) {
             res.sendFile(path + '/public/index.html');
     });
+    
     
     app.route('/login')
     .get(function (req, res) {
         res.sendFile(path + '/public/login.html');
     });
     
+    //when logged out, back to home
     app.route('/logout')
     .get(function (req, res) {
         req.logout();
-        res.redirect('/login');
+        res.redirect('/');
     });
     
     app.route('/profile')
@@ -43,14 +46,17 @@ module.exports = function (app, passport) {
         res.json(req.user.github);
     });
     
+    // authenticate user on github
     app.route('/auth/github')
     .get(passport.authenticate('github'));
     
+    //after authentcation, what next
     app.route('/auth/github/callback')
     .get(passport.authenticate('github', {
         successRedirect: '/',
         failureRedirect: '/login'
     }));
+    
     //create created polls for authenticated individuals
     //add new polls
     //delete polls by user
